@@ -29,6 +29,10 @@ proxy = https://user:pass@example.com:8080
 
 Logs are written to `~/.wakatime/antigravity-cli.log`.
 
+If Node.js is installed but is not available in the hook's `PATH`, set `NODE_BIN`
+to the absolute path of the Node.js executable. On NixOS, the hook runner also
+falls back to `nix run nixpkgs#nodejs` when `nix` is available.
+
 [wakatime]: https://wakatime.com/
 [antigravity-cli]: https://antigravity.google/docs/cli-overview
 [wakatime-cli]: https://github.com/wakatime/wakatime-cli

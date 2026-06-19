@@ -3,7 +3,7 @@
     "PreInvocation": [
       {
         "type": "command",
-        "command": "node ./bin/antigravity-cli-wakatime.js --background --event=preInvocation",
+        "command": "./scripts/run --event=preInvocation",
         "timeout": 5
       }
     ],
@@ -13,7 +13,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ./bin/antigravity-cli-wakatime.js --background --event=postToolUse",
+            "command": "./scripts/run --event=postToolUse",
             "timeout": 5
           }
         ]

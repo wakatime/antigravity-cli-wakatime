@@ -6,6 +6,8 @@ const path = require('node:path');
 const test = require('node:test');
 
 const pluginPath = path.resolve(__dirname, '..', 'bin', 'antigravity-cli-wakatime.js');
+const hookConfigPath = path.resolve(__dirname, '..', 'hooks.json');
+const runnerPath = path.resolve(__dirname, '..', 'scripts', 'run');
 
 function platformName() {
   return process.platform === 'win32' ? 'windows' : process.platform;
@@ -71,6 +73,34 @@ async function waitForCall(captureFile) {
   }
   return [];
 }
+
+test('hooks invoke the runner instead of node directly', () => {
+  const hooks = fs.readFileSync(hookConfigPath, 'utf8');
+
+  assert.doesNotMatch(hooks, /\bnode\b/);
+  assert.match(hooks, /\.\/scripts\/run --event=preInvocation/);
+  assert.match(hooks, /\.\/scripts\/run --event=postToolUse/);
+});
+
+test(
+  'runner uses NODE_BIN when node is unavailable in PATH',
+  { skip: process.platform === 'win32' },
+  () => {
+    const result = childProcess.spawnSync('/bin/sh', [runnerPath, '--event=postToolUse'], {
+      env: {
+        ...process.env,
+        NODE_BIN: process.execPath,
+        NODE_OPTIONS: '--definitely-not-a-valid-node-option',
+        PATH: '',
+      },
+      input: '',
+      encoding: 'utf8',
+    });
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.deepEqual(JSON.parse(result.stdout), {});
+  },
+);
 
 test('syncs the first invocation with Antigravity and project metadata', (t) => {
   const fixture = createFixture(t);

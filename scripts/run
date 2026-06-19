@@ -1,0 +1,32 @@
+#!/bin/sh
+set -eu
+
+case "$0" in
+  */*) SCRIPT_DIR=${0%/*} ;;
+  *) SCRIPT_DIR=. ;;
+esac
+ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
+ENTRY="$ROOT/bin/antigravity-cli-wakatime.js"
+
+# Avoid project-specific Node options breaking plugin hooks.
+if [ -n "${NODE_OPTIONS:-}" ]; then
+  unset NODE_OPTIONS
+fi
+
+if [ -n "${NODE_BIN:-}" ] && [ -x "$NODE_BIN" ]; then
+  exec "$NODE_BIN" "$ENTRY" --background "$@"
+fi
+
+if command -v node >/dev/null 2>&1; then
+  exec node "$ENTRY" --background "$@"
+fi
+
+if command -v nix >/dev/null 2>&1; then
+  exec nix run nixpkgs#nodejs -- "$ENTRY" --background "$@"
+fi
+
+echo "Error: Node.js not found.
+- Install Node.js and ensure it is available in PATH,
+- set NODE_BIN=/absolute/path/to/node, or
+- on NixOS, ensure nix is available and flakes are enabled." >&2
+exit 127
