@@ -44,6 +44,16 @@ If Node.js is installed but is not available in the hook's `PATH`, set `NODE_BIN
 to the absolute path of the Node.js executable. On NixOS, the hook runner also
 falls back to `nix run nixpkgs#nodejs` when `nix` is available.
 
+### Windows Hooks Troubleshooting
+
+On Windows, Antigravity executes hook commands with the current working directory (CWD) set to the user's home directory (e.g., `C:\Users\<Username>`). Because of this, the relative path `./scripts/run` in `hooks.json` fails to resolve, and hook commands fail silently.
+
+To resolve this issue:
+1. Open the `hooks.json` file in your installed `antigravity-cli-wakatime` plugin directory.
+2. Replace `./scripts/run` with the absolute path to `run.cmd`, for example:
+   * `"C:\\Users\\<YourUsername>\\.gemini\\config\\plugins\\antigravity-cli-wakatime\\scripts\\run.cmd"`
+
+
 [wakatime]: https://wakatime.com/
 [antigravity]: https://antigravity.google/docs/plugins
 [antigravity-cli]: https://antigravity.google/docs/cli-overview
